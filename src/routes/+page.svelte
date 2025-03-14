@@ -9,15 +9,23 @@
 	let all_invoices: Invoice[] = $state([]);
 
 	async function save() {
-		const new_invoice_id = await db.invoices.add({
-			date: new Date().toISOString(),
-			form_data: $state.snapshot(form_data)
-		});
+		if (loaded_id) {
+			await db.invoices.update(loaded_id, {
+				form_data: $state.snapshot(form_data),
+				date: new Date().toISOString()
+			});
+			return;
+		} else {
+			const new_invoice_id = await db.invoices.add({
+				date: new Date().toISOString(),
+				form_data: $state.snapshot(form_data)
+			});
 
-		loaded_id = new_invoice_id;
-		status = 'READY';
-		load_all_invoices();
-		load_recent_invoice();
+			loaded_id = new_invoice_id;
+			status = 'READY';
+			load_all_invoices();
+			load_recent_invoice();
+		}
 	}
 
 	async function load_all_invoices() {
