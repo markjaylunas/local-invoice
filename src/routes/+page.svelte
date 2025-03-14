@@ -53,6 +53,11 @@
 		status = 'READY';
 	}
 
+	function new_invoice() {
+		loaded_id = null;
+		form_data = structuredClone(initial_data);
+	}
+
 	$effect(() => {
 		load_all_invoices();
 		load_recent_invoice();
@@ -69,6 +74,7 @@
 			{/each}
 		</select>
 
+		<button onclick={new_invoice}>New Invoice</button>
 		<button onclick={save}>Save</button>
 	</div>
 	<div>
