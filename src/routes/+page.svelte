@@ -66,6 +66,24 @@
 		form_data = structuredClone(initial_data);
 	}
 
+	async function export_data() {
+		try {
+			const all_invoices = await db.invoices.orderBy('date').toArray();
+			const json_string = JSON.stringify(all_invoices, null, 2);
+			const blob = new Blob([json_string], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'invoices.json';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
 	$effect(() => {
 		load_all_invoices();
 		load_recent_invoice();
@@ -90,6 +108,7 @@
 
 		<button onclick={new_invoice}>New Invoice</button>
 		<button onclick={() => save($state.snapshot(form_data))}>Save</button>
+		<button onclick={export_data}>Export</button>
 	</div>
 	<div>
 		<div>
