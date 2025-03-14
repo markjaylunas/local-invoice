@@ -17,6 +17,7 @@
 		loaded_id = new_invoice_id;
 		status = 'READY';
 		load_all_invoices();
+		load_recent_invoice();
 	}
 
 	async function load_all_invoices() {
@@ -40,8 +41,21 @@
 		status = 'READY';
 	}
 
+	async function load_recent_invoice() {
+		status = 'LOADING';
+		const invoice = await db.invoices.orderBy('date').last();
+
+		if (invoice) {
+			form_data = invoice.form_data;
+			loaded_id = invoice.id;
+		}
+
+		status = 'READY';
+	}
+
 	$effect(() => {
 		load_all_invoices();
+		load_recent_invoice();
 	});
 </script>
 
@@ -49,7 +63,7 @@
 	<h1>Invoice</h1>
 
 	<div>
-		<select onchange={load_invoice} name="all_invoices" id="all_invoices">
+		<select value={loaded_id} onchange={load_invoice} name="all_invoices" id="all_invoices">
 			{#each all_invoices as invoice}
 				<option value={invoice.id}>{invoice.date}</option>
 			{/each}
