@@ -8,17 +8,17 @@
 	let loaded_id: number | undefined | null = $state(null);
 	let all_invoices: Invoice[] = $state([]);
 
-	async function save() {
+	async function save(data: typeof initial_data) {
 		if (loaded_id) {
 			await db.invoices.update(loaded_id, {
-				form_data: $state.snapshot(form_data),
+				form_data: data,
 				date: new Date().toISOString()
 			});
 			return;
 		} else {
 			const new_invoice_id = await db.invoices.add({
 				date: new Date().toISOString(),
-				form_data: $state.snapshot(form_data)
+				form_data: data
 			});
 
 			loaded_id = new_invoice_id;
@@ -70,6 +70,12 @@
 		load_all_invoices();
 		load_recent_invoice();
 	});
+
+	$effect(() => {
+		if (status === 'READY') {
+			save($state.snapshot(form_data));
+		}
+	});
 </script>
 
 <section>
@@ -83,7 +89,7 @@
 		</select>
 
 		<button onclick={new_invoice}>New Invoice</button>
-		<button onclick={save}>Save</button>
+		<button onclick={() => save($state.snapshot(form_data))}>Save</button>
 	</div>
 	<div>
 		<div>
